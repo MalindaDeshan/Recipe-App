@@ -39,6 +39,21 @@ app.post("/api/favourites", async(req, res) => {
   }
 });
 
+//Fetch all favourite recipes for a user
+app.get("/api/favourites/:userId", async(req, res) => {
+  try {
+    const {userId} =req.params
+
+    const userFavorites = await db.select().from(favouritesTable).where(eq(favouritesTable.userId,userId));
+
+    res.status(200).json(userFavorites);
+
+  } catch (error) {
+    console.error("Error fetching a favourite recipe:", error);
+    res.status(500).json({error: "Internal server error"});
+  }
+})
+
 //Delete a recipe from database
 app.delete("/api/favourites/:userId/:recipeId", async(req, res) => {
   try {
