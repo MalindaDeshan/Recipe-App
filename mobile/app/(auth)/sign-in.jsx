@@ -1,66 +1,151 @@
-import { useSignIn } from '@clerk/clerk-expo'
-import { Link, useRouter } from 'expo-router'
-import { Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import { useSignIn } from '@clerk/clerk-expo';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, Text, View,KeyboardAvoidingView, Platform, ScrollView, TextInput, TouchableOpacity} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-export default function Page() {
-  const { signIn, setActive, isLoaded } = useSignIn()
-  const router = useRouter()
+import {Image} from "expo-image";
+import {authStyles} from "../../assets/styles/auth.styles";
+import { COLORS } from '../../constants/colors';
 
-  const [emailAddress, setEmailAddress] = React.useState('')
-  const [password, setPassword] = React.useState('')
+const SignInScreen = () => {
+  const router = useRouter();
+  const { signIn, setActive, isLoaded } = useSignIn();
 
-  // Handle the submission of the sign-in form
-  const onSignInPress = async () => {
-    if (!isLoaded) return
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-    // Start the sign-in process using the email and password provided
-    try {
-      const signInAttempt = await signIn.create({
-        identifier: emailAddress,
-        password,
-      })
-
-      // If sign-in process is complete, set the created session as active
-      // and redirect the user
-      if (signInAttempt.status === 'complete') {
-        await setActive({ session: signInAttempt.createdSessionId })
-        router.replace('/')
-      } else {
-        // If the status isn't complete, check why. User might need to
-        // complete further steps.
-        console.error(JSON.stringify(signInAttempt, null, 2))
-      }
-    } catch (err) {
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2))
+  const handleSignIn = async () => {
+    // FIXED VALIDATION BLOCK
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter email and password");
+      return;
     }
-  }
+
+    if (!isLoaded) return;
+
+    setLoading(true);
+
+    try {
+      // THIS IS OK NOW — FUNCTION IS ASYNC
+      const signInAttempt = await signIn.create({
+        identifier: email,
+        password: password,
+      });
+
+      if (signInAttempt.status === "complete") {
+        await setActive({ session: signInAttempt.createdSessionId });
+        router.push("/home");
+      } else {
+        Alert.alert("Error", "Sign-in failed. Please try again.");
+      }
+
+    } catch (error) {
+      Alert.alert("Error", error.errors?.[0]?.message || "Something in failed");
+      console.error(JSON.stringify(error, null, 2)); // Log full error to console
+
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <View>
-      <Text>Sign in</Text>
-      <TextInput
-        autoCapitalize="none"
-        value={emailAddress}
-        placeholder="Enter email"
-        onChangeText={(emailAddress) => setEmailAddress(emailAddress)}
-      />
-      <TextInput
-        value={password}
-        placeholder="Enter password"
-        secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
-      />
-      <TouchableOpacity onPress={onSignInPress}>
-        <Text>Continue</Text>
-      </TouchableOpacity>
-      <View style={{ display: 'flex', flexDirection: 'row', gap: 3 }}>
-        <Link href="/sign-up">
-          <Text>Sign up</Text>
-        </Link>
-      </View>
+    <View style={authStyles.container}>
+      <KeyboardAvoidingView
+        style={authStyles.keyboardView}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.select({
+        ios: 64,
+        android: 50,
+      })}
+      >
+
+        <ScrollView
+          contentContainerStyle={authStyles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+
+          <View style={authStyles.imageContainer}>
+            <Image 
+              source={require("../../assets/images/i1.png")}
+              style={authStyles.image}
+              contentFit='contain'
+            />
+          </View>
+
+          <Text style={authStyles.title}>Welcome!</Text>
+
+          {/* Form Container */}
+          <View style={authStyles.formContainer}>
+
+            {/* EMAIL INPUT */}
+            <View style={authStyles.inputContainer}>
+              <TextInput
+                style={authStyles.textInput}
+                placeholder="Enter Email"
+                placeholderTextColor={COLORS.textLight}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+
+            {/* PASSWORD INPUT */}
+            <View style={authStyles.inputContainer}>
+              <TextInput
+                style={authStyles.textInput}
+                placeholder="Enter Password"
+                placeholderTextColor={COLORS.textLight}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+              />
+              <TouchableOpacity
+                style={authStyles.eyeButton}
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Ionicons 
+                  name={showPassword ? "eye-outline" : "eye-off-outline"} 
+                  size={24} 
+                  color={COLORS.textLight} 
+                />
+
+              </TouchableOpacity>
+            </View>
+
+            {/* SIGN IN BUTTON */}
+            <TouchableOpacity
+                style={[authStyles.authButton, loading && authStyles.buttonDisabled]}
+                onPress={handleSignIn}
+                disabled={loading}
+                activeOpacity={0.8}
+            >
+            <Text style={authStyles.buttonText}>
+              {loading ? "Signing In..." : "Sign In"}
+            </Text>
+            </TouchableOpacity>
+
+            {/*Sign Up Link*/}
+            <TouchableOpacity
+              style={authStyles.linkContainer}
+              onPress={()=> router.push("/(auth)/sign-up")}
+            >
+              <Text style={authStyles.linkText}>
+                Don&apos;t have an account?<Text style={authStyles.link}>Sign Up</Text>
+              </Text>
+            </TouchableOpacity>
+
+          </View>
+
+        </ScrollView>
+
+      </KeyboardAvoidingView>
     </View>
-  )
-}
+  );
+};
+
+export default SignInScreen;
