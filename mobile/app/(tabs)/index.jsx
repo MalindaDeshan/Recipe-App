@@ -46,6 +46,23 @@ const HomeScreen = () => {
       setLoading(false)
     }
   }
+
+  const loadCategoryData = async (category) => {
+    try {
+      const meals = await MealAPI.filterByCategories(category);
+      const transformedMeals = meals
+        .map((meal) => MealAPI.transformMealData(meal))
+        .filter((meal) => meal !== null);
+      setRecipes(transformedMeals);
+
+    } catch (error) {
+      console.log("Error loading category data",error);
+      setRecipes([]);
+    }
+  };
+
+
+  const
   return (
     <View>
       <Text>HomeScreen</Text>
