@@ -90,28 +90,35 @@ const onRefresh =async () => {
       >
         {/*Welcome Section*/}
         <View style={homeStyles.welcomeSection}>
-          <Text
+       <View
+          style={{
+            marginTop: 10,
+            backgroundColor: COLORS.background,
+            paddingVertical: 8,
+            paddingHorizontal: 15,
+            borderRadius: 10,
+            overflow: "hidden",
+            elevation: 3,
+            shadowColor: "#000",
+            shadowOpacity: 0.6,
+            shadowRadius: 4,
+            shadowOffset: { width: 4, height: 8 },
+          }}
+        >
+          <Image
+            source={require("../../assets/images/logo.png")}
             style={{
-              fontSize: 30,
-              fontWeight: "bold",
-              marginTop: 10,
-              textAlign: "center",
-              color: COLORS.primary,
-              backgroundColor: "#fff",     // white box
-              paddingVertical: 8,          // space inside box
-              paddingHorizontal: 15,
-              borderRadius: 10,            // rounded corners
-              overflow: "hidden",          // keep rounded effect
-              elevation: 3,                // shadow for Android
-              shadowColor: "#000",         // shadow for iOS
-              shadowOpacity: 0.2,
-              shadowRadius: 4,
-              shadowOffset: { width: 0, height: 2 },
+              width: 300,       // required
+              height: 100,      // required
+              borderRadius: 10,
+              alignSelf: "center", // optional (centers image)
             }}
-          >
-            Welcome To වට්ටෝරුව
-          </Text>
-        </View>
+            resizeMode="contain"
+  />
+</View>
+
+      </View>
+
 
         {/*Featured Section*/}
         {featuredRecipe && (<View style={homeStyles.featuredSection}>
