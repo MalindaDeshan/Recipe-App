@@ -6,6 +6,7 @@ import { homeStyles } from "../../assets/styles/home.styles";
 import { Image } from 'expo-image';
 import { COLORS } from '../../constants/colors';
 import {Ionicons} from '@expo/vector-icons'
+import CategoryFilter from '../../components/CategoryFilter';
 const HomeScreen = () => {
 
   const router = useRouter();
@@ -49,6 +50,21 @@ const HomeScreen = () => {
       setRefreshing(false);
     }
   };
+
+  const handleCategorySelect = async (categoryName) => {
+  setSelectedCategory(categoryName);
+  try {
+    const meals = await MealAPI.filterByCategories(categoryName);
+    const transformedMeals = meals
+      .map((meal) => MealAPI.transformMealData(meal))
+      .filter((meal) => meal !== null);
+    setRecipes(transformedMeals);
+  } catch (error) {
+    console.log("Error loading category data", error);
+    setRecipes([]);
+  }
+};
+
 
   useEffect(() => {
     loadData();
@@ -134,6 +150,15 @@ const HomeScreen = () => {
 
           </View>)
         }
+
+        {/*Categories Section*/}
+        {categories.length > 0 && (
+          <CategoryFilter
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={handleCategorySelect}
+          />
+        )}
       </ScrollView>
     </View>
   );
