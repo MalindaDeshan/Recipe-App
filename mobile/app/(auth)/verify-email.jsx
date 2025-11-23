@@ -58,7 +58,7 @@ const VerifyEmail = ({email,onBack}) => {
             style={authStyles.imageContainer}
           >
             <Image
-              sourece = {require("../../assets/images/i3.png")}
+              sourece = {require("../../assets/images/app_icon.png")}
               style= {authStyles.image}
               contentFit="contain"
             />

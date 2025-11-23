@@ -6,6 +6,7 @@ import {searchStyles} from '../../assets/styles/search.styles'
 import {Ionicons} from '@expo/vector-icons'
 import { COLORS } from '../../constants/colors';
 import RecipeCard from '../../components/RecipeCard';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 
 const SearchScreen = () => {
@@ -75,7 +76,7 @@ const SearchScreen = () => {
 
   },[debouncedSearchQuery,initialLoading])
 
-  if(initialLoading) return <Text style={searchStyles.loadingContainer}>Loading Data....</Text>
+  if(initialLoading) return <LoadingSpinner/>
 
 
   return (
