@@ -1,7 +1,11 @@
-import { View, Text } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { MealAPI } from '../../services/mealAPI';
 import { useDebounce } from '../../hooks/useDebounce';
+import {searchStyles} from '../../assets/styles/search.styles'
+import {Ionicons} from '@expo/vector-icons'
+import { COLORS } from '../../constants/colors';
+import RecipeCard from '../../components/RecipeCard';
 
 
 const SearchScreen = () => {
@@ -52,18 +56,95 @@ const SearchScreen = () => {
 
   useEffect(() => {
     if(initialLoading) return; 
-    const habdleSearch = async () => {
+    const handleSearch = async () => {
       setLoading(true);
-    } 
+
+      try {
+        const results = await performSearch(debouncedSearchQuery)
+        setRecipes(results)
+      } catch (error) {
+        console.error("Error Searching: ",error)
+        setRecipes([])
+        
+      } finally {
+        setLoading(false)
+      }
+    };
+
+    handleSearch()
 
   },[debouncedSearchQuery,initialLoading])
 
+  if(initialLoading) return <Text style={searchStyles.loadingContainer}>Loading Data....</Text>
+
 
   return (
-    <View>
-      <Text>search</Text>
-    </View>
-  )
-}
+    <View style = {searchStyles.container}>
+      <View style={searchStyles.searchSection}>
+        <View style={searchStyles.searchContainer}>
+          <Ionicons
+            name ="search"
+            size = {20}
+            color = {COLORS.textLight}
+            style={searchStyles.searchIcon}
+          />
+          <TextInput
+            style={searchStyles.searchInput}
+            placeholder='Search recipes, ingradients here...'
+            placeholderTextColor={COLORS.textLight}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            returnKeyType='search'
+          />
 
-export default SearchScreen
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={()=> setSearchQuery("")}
+              style={searchStyles.clearButton}
+            >
+              <Ionicons name="close-circle" size={20} color={COLORS.textLight}/>
+            </TouchableOpacity>
+          )}
+
+        </View>
+        <View style={searchStyles.resultsSection}>
+          <View style={searchStyles.resultsHeader}>
+            <Text style={searchStyles.resultsTitle}>
+              {searchQuery ? `Results for "${searchQuery}"` : "Popular Recipes"}
+            </Text>
+            <Text>
+              <Text style={searchStyles.resultsCount}>{recipes.length} found</Text>
+            </Text>
+          </View>
+          {loading ? (
+            <View style={searchStyles.loadingContainer}>
+              <Text>Loading....</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={recipes}
+              renderItem={({item}) => <RecipeCard recipe={item}/>}
+                keyExtractor={(item)=> item.id.toString()}
+                numColumns={2}
+                columnWrapperStyle={searchStyles.row}
+                contentContainerStyle={searchStyles.recipesGrid}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={<NoResulsFound/>}
+            />
+          )}
+        </View>
+      </View>
+    </View>
+  );
+};
+
+export default SearchScreen;
+
+function NoResulsFound(){
+  return(
+    <View style={searchStyles.emptyState}>
+      <Ionicons name="serch-outline" size={64} color={COLORS.textLight}/>
+      <Text style={searchStyles.emptyTitle}>No recipe found</Text>
+      <Text style={searchStyles.emptyDescription}>Try your spelling or try diferent key word</Text>
+    </View>
+  );
+}

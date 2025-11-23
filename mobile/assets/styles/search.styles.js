@@ -7,6 +7,7 @@ export const searchStyles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   searchSection: {
+    flex:1,
     paddingHorizontal: 16,
     paddingTop: 16,
   },
@@ -72,8 +73,7 @@ export const searchStyles = StyleSheet.create({
   activeQuickFilterText: {
     color: COLORS.white,
   },
-  resultsSection: {
-    flex: 1,
+  recipesSection: {
     paddingHorizontal: 16,
     marginTop: 8,
   },
@@ -102,10 +102,10 @@ export const searchStyles = StyleSheet.create({
   },
   recipesGrid: {
     gap: 16,
-    paddingBottom: 32,
   },
   row: {
     justifyContent: "space-between",
+    gap: 16,
   },
   emptyState: {
     flex: 1,
