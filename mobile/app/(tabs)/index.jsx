@@ -92,23 +92,22 @@ const onRefresh =async () => {
         <View style={homeStyles.welcomeSection}>
        <View
           style={{
-            marginTop: 10,
+            marginTop: 5,
             backgroundColor: COLORS.background,
-            paddingVertical: 8,
-            paddingHorizontal: 15,
             borderRadius: 10,
             overflow: "hidden",
             elevation: 3,
             shadowColor: "#000",
-            shadowOpacity: 0.6,
+            shadowOpacity: 0.10,
             shadowRadius: 4,
-            shadowOffset: { width: 4, height: 8 },
+            shadowOffset: { width: 4, height: 10 },
+            alignItems: "center"
           }}
         >
           <Image
             source={require("../../assets/images/logo.png")}
             style={{
-              width: 300,       // required
+              width: 320,       // required
               height: 100,      // required
               borderRadius: 10,
               alignSelf: "center", // optional (centers image)
